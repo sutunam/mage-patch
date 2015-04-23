@@ -1,5 +1,9 @@
 <?php
 
+if (version_compare(phpversion(), '5.3.0', '<')) {
+    die('PHP version must be at least 5.3.0');
+}
+
 class PatchMage {
     
     protected $_patchData;
@@ -158,17 +162,21 @@ class PatchMage {
     {
         $f = basename(__FILE__);
         echo <<<OUTPUT
-MagePatch : Upgrade Multiple Magento
+MagePatch : Upgrade Multiple Magento easily
 
-Usage: php -f $f -- [options] [dirs...]
+Usage: php -f $f -- [options] dirs ...
 
-[dirs...] Magento directories where the patches will be applied
+dirs:
+    Magento directory where the patches will be applied
 
-Options
-  --sudo [user]
-    Specify what what will execute the patch. If you use
-    the magic '_' value, the patch will be executed by the
-    owner of the Magento directory, using sudo command.
+options:
+    --sudo USR
+        Specify user USR who will execute the patch. If you use
+	    the magic '_' value, the patch will be executed by the
+	    owner of the Magento directory, using sudo command.
+    --config URL
+    	Specify URL of the config.json. Default is 
+    	https://raw.githubusercontent.com/sutunam/mage-patch/master/config.json
 
 OUTPUT;
         
