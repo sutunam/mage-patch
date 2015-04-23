@@ -179,6 +179,10 @@ function extractParams($name, &$params) {
 $sudo = extractParams('--sudo', $dirs);
 $configUrl = extractParams('--config', $dirs);
 
+if (!$configUrl) {
+    $configUrl = 'https://raw.githubusercontent.com/sutunam/mage-patch/master/config.json';
+}
+
 $patch = new PatchMage($configUrl);
 
 if (!count($dirs)) {

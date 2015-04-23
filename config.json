@@ -1,5 +1,5 @@
 {
-	"baseUrl":"http://",
+	"baseUrl":"https://raw.githubusercontent.com/sutunam/mage-patch/master/patches/",
 	"patches":{
 	    "SUPEE-1533":{
 	        "1.8->1.9":"PATCH_SUPEE-1533_EE_1.13.x_v1-2015-02-10-08-18-32.sh",
