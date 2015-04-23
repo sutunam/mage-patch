@@ -100,7 +100,7 @@ class PatchMage {
         $cmd = '/bin/bash '.$dir.$patchFile;
         
         if ($sudoUser) {
-            if ($sudoUser == '*') {
+            if ($sudoUser == '_') {
                 $sudoUser = '\\#'.fileowner($dir); //uid of user
             }
             
@@ -167,8 +167,8 @@ Usage: php -f $f -- [options] [dirs...]
 Options
   --sudo [user]
     Specify what what will execute the patch. If you use
-    the magic '*' value, the patch will be executed by the
-    owner of the Magento directory
+    the magic '_' value, the patch will be executed by the
+    owner of the Magento directory, using sudo command.
 
 OUTPUT;
         
