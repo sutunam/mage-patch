@@ -97,7 +97,7 @@ class PatchMage {
             throw new Exception('cannot change current working directory to '.$dir);
         }
         
-        $cmd = 'sh '.$dir.$patchFile;
+        $cmd = '/bin/bash '.$dir.$patchFile;
         
         if ($sudoUser) {
             if ($sudoUser == '*') {
@@ -107,8 +107,7 @@ class PatchMage {
             $cmd = 'sudo -u '.$sudoUser.' '.$cmd;
         }
         
-        exec($cmd, $output, $ret);
-        echo implode(PHP_EOL, $output);
+        passthru($cmd, $ret);
         
         chdir($cwd);
         
