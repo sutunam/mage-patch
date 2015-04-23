@@ -92,6 +92,11 @@ class PatchMage {
     
     protected function _applyPatch ($dir, $patchFile, $sudoUser)
     {
+        $cwd = getcwd();
+        if (!chdir($dir)) {
+            throw new Exception('cannot change current working directory to '.$dir);
+        }
+        
         $cmd = 'sh '.$dir.$patchFile;
         
         if ($sudoUser) {
@@ -105,6 +110,8 @@ class PatchMage {
         exec($cmd, $output, $ret);
         echo implode(PHP_EOL, $output);
         
+        chdir($cwd);
+        
         if ($ret) {
             throw new Exception('Error applying patch');
         }
@@ -114,11 +121,12 @@ class PatchMage {
     {
         $dir = rtrim($dir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
         
-        echo $dir.':'.PHP_EOL;
         $mageVersion = $this->getMagentoVersion($dir);
         //$mageVersion = '1.5.1.0';
         
         echo 'Magento version: '.$mageVersion.PHP_EOL;
+        
+        $appliedPatches = array();
         
         foreach ($this->_patchData['patches'] as $patch => $patchVersions) {
             $patchFile = $this->_getPatchFile($patchVersions, $mageVersion);
@@ -132,7 +140,12 @@ class PatchMage {
             
             $this->_downloadPatch($dir, $patchFile);
             $this->_applyPatch($dir, $patchFile, $sudoUser);
+            unlink($dir.$patchFile);
+            
+            $appliedPatches[] = $patch;
         }
+        
+        echo PHP_EOL.PHP_EOL.'The following patches have been applied :'.PHP_EOL.implode(PHP_EOL, $appliedPatches).PHP_EOL;
     }
     
     public function multiPatch (array $dirs, $sudoUser = null)
