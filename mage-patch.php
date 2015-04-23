@@ -189,7 +189,7 @@ unset($dirs[0]);
 function extractParams($name, &$params) {
     $value = null;
     if (false !== $key = array_search($name, $params)) {
-        $sudo = $params[$key+1];
+        $value = $params[$key+1];
         unset($params[$key]);
         unset($params[$key+1]);
     }
