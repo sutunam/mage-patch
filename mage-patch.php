@@ -7,6 +7,8 @@ if (version_compare(phpversion(), '5.3.0', '<')) {
 class PatchMage {
     
     protected $_patchData;
+    protected $_suUser;
+    protected $_sudoUser;
     
     public function __construct($jsonConfigUrl)
     {
@@ -94,7 +96,7 @@ class PatchMage {
         return $patchFilename;
     }
     
-    protected function _applyPatch ($dir, $patchFile, $sudoUser)
+    protected function _applyPatch ($dir, $patchFile)
     {
         $cwd = getcwd();
         if (!chdir($dir)) {
@@ -103,12 +105,20 @@ class PatchMage {
         
         $cmd = '/bin/bash '.$dir.$patchFile;
         
-        if ($sudoUser) {
-            if ($sudoUser == '_') {
-                $sudoUser = '\\#'.fileowner($dir); //uid of user
+        if ($this->_suUser) {
+            $user = $this->_suUser;
+            if ($this->_suUser == '_') {
+                $user = '\\#'.fileowner($dir); //uid of user
+            }
+        
+            $cmd = 'su -c '.escapeshellarg($cmd).' '.$user;
+        } elseif ($this->_sudoUser) {
+            $user = $this->_sudoUser;
+            if ($this->_sudoUser == '_') {
+                $user = '\\#'.fileowner($dir); //uid of user
             }
             
-            $cmd = 'sudo -u '.$sudoUser.' '.$cmd;
+            $cmd = 'sudo -u '.$user.' '.$cmd;
         }
         
         passthru($cmd, $ret);
@@ -120,7 +130,17 @@ class PatchMage {
         }
     }
     
-    function patch ($dir, $sudoUser = null)
+    public function setSudoUser ($user)
+    {
+        $this->_sudo = $user;
+    }
+    
+    public function setSuUser ($user)
+    {
+        $this->_su = $user;
+    }
+    
+    public function patch ($dir)
     {
         $dir = rtrim($dir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
         
@@ -142,7 +162,7 @@ class PatchMage {
             echo 'Patch file found: '.$patchFile.PHP_EOL;
             
             $this->_downloadPatch($dir, $patchFile);
-            $this->_applyPatch($dir, $patchFile, $sudoUser);
+            $this->_applyPatch($dir, $patchFile);
             unlink($dir.$patchFile);
             
             $appliedPatches[] = $patch;
@@ -151,10 +171,10 @@ class PatchMage {
         echo PHP_EOL.PHP_EOL.'The following patches have been applied :'.PHP_EOL.implode(PHP_EOL, $appliedPatches).PHP_EOL;
     }
     
-    public function multiPatch (array $dirs, $sudoUser = null)
+    public function multiPatch (array $dirs)
     {
         foreach ($dirs as $dir) {
-            $this->patch($dir, $sudoUser);
+            $this->patch($dir);
         }
     }
     
@@ -170,10 +190,10 @@ dirs:
     Magento directory where the patches will be applied
 
 options:
-    --sudo USR
-        Specify user USR who will execute the patch. If you use
-	    the magic '_' value, the patch will be executed by the
-	    owner of the Magento directory, using sudo command.
+    --sudo|--su USR
+        Specify user USR who will execute the patch with the sudo or the su
+        command. If you use the magic '_' value, the patch will be executed by
+        the owner of the Magento directory, using sudo or su command.
     --config URL
     	Specify URL of the config.json. Default is 
     	https://raw.githubusercontent.com/sutunam/mage-patch/master/config.json
@@ -196,14 +216,19 @@ function extractParams($name, &$params) {
     return $value;
 }
 
-$sudo = extractParams('--sudo', $dirs);
-$configUrl = extractParams('--config', $dirs);
-
-if (!$configUrl) {
+if (!$configUrl = extractParams('--config', $dirs)) {
     $configUrl = 'https://raw.githubusercontent.com/sutunam/mage-patch/master/config.json';
 }
 
 $patch = new PatchMage($configUrl);
+
+if ($su = extractParams('--su', $dirs)) {
+    $patch->setSuUser($su);
+}
+
+if ($sudo = extractParams('--sudo', $dirs)) {
+    $patch->setSudoUser($sudo);
+}
 
 if (!count($dirs)) {
     $patch->help();
