@@ -9,6 +9,7 @@ class PatchMage {
     protected $_patchData;
     protected $_suUser;
     protected $_sudoUser;
+    protected $_allowedPatches;
     
     public function __construct($jsonConfigUrl)
     {
@@ -145,6 +146,15 @@ class PatchMage {
         $this->_suUser = $user;
     }
     
+    public function setAllowedPatches ($patches)
+    {
+        if (!is_array($patches)) {
+            $patches = explode(',', $patches);
+        }
+        
+        $this->_allowedPatches = $patches; 
+    }
+    
     public function patch ($dir)
     {
         $dir = rtrim($dir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
@@ -158,7 +168,13 @@ class PatchMage {
         
         $appliedPatches = array();
         
-        foreach ($this->_patchData['patches'] as $patch => $patchVersions) {
+        $patches = $this->_patchData['patches'];
+        
+        if ($this->_allowedPatches) {
+            $patches = array_intersect_key($patches, array_flip($this->_allowedPatches));
+        }
+        
+        foreach ($patches as $patch => $patchVersions) {
             $patchFile = $this->_getPatchFile($patchVersions, $mageVersion);
             
             if (!$patchFile) {
@@ -204,7 +220,10 @@ options:
     --config URL
     	Specify URL of the config.json. Default is 
     	https://raw.githubusercontent.com/sutunam/mage-patch/master/config.json
-
+    --patches patch-name,...
+        Restrict the list of the patch to be applied to one or more patch-name,
+        separated by comma.
+    
 OUTPUT;
         
     }    
@@ -235,6 +254,10 @@ if ($su = extractParams('--su', $dirs)) {
 
 if ($sudo = extractParams('--sudo', $dirs)) {
     $patch->setSudoUser($sudo);
+}
+
+if ($patches = extractParams('--patches', $dirs)) {
+    $patch->setAllowedPatches($patches);
 }
 
 if (!count($dirs)) {
