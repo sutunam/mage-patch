@@ -108,7 +108,8 @@ class PatchMage {
         if ($this->_suUser) {
             $user = $this->_suUser;
             if ($this->_suUser == '_') {
-                $user = '\\#'.fileowner($dir); //uid of user
+                $user = posix_getpwuid(fileowner($dir)); // username infos from uid
+                $user = $user['name'];
             }
         
             $cmd = 'su -c '.escapeshellarg($cmd).' '.$user;
