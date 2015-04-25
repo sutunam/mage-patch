@@ -110,8 +110,12 @@ class PatchMage {
             if ($this->_suUser == '_') {
                 $user = posix_getpwuid(fileowner($dir)); // username infos from uid
                 $user = $user['name'];
+                
+                if (!$user) {
+                    throw new Exception('Cannot get username of UID '.fileowner($dir));
+                }
             }
-        
+            
             $cmd = 'su -c '.escapeshellarg($cmd).' '.$user;
         } elseif ($this->_sudoUser) {
             $user = $this->_sudoUser;
@@ -144,6 +148,8 @@ class PatchMage {
     public function patch ($dir)
     {
         $dir = rtrim($dir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
+        
+        echo $dir.':'.PHP_EOL;
         
         $mageVersion = $this->getMagentoVersion($dir);
         //$mageVersion = '1.5.1.0';
