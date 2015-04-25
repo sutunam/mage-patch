@@ -132,12 +132,12 @@ class PatchMage {
     
     public function setSudoUser ($user)
     {
-        $this->_sudo = $user;
+        $this->_sudoUser = $user;
     }
     
     public function setSuUser ($user)
     {
-        $this->_su = $user;
+        $this->_suUser = $user;
     }
     
     public function patch ($dir)
