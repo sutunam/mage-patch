@@ -100,11 +100,8 @@ class PatchMage {
     protected function _applyPatch ($dir, $patchFile)
     {
         $cwd = getcwd();
-        if (!chdir($dir)) {
-            throw new Exception('cannot change current working directory to '.$dir);
-        }
         
-        $cmd = '/bin/bash '.$dir.$patchFile;
+        $cmd = '/bin/bash '.$patchFile;
         
         if ($this->_suUser) {
             $user = $this->_suUser;
@@ -125,6 +122,10 @@ class PatchMage {
             }
             
             $cmd = 'sudo -u '.$user.' '.$cmd;
+        }
+        
+        if (!chdir($dir)) {
+            throw new Exception('cannot change current working directory to '.$dir);
         }
         
         passthru($cmd, $ret);
