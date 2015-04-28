@@ -223,7 +223,7 @@ options:
     	https://raw.githubusercontent.com/sutunam/mage-patch/master/config.json
     --patches patch-name,...
         Restrict the list of the patch to be applied to one or more patch-name,
-        separated by comma.
+        separated by comma. The patch-names are listed in the config.json.
     
 OUTPUT;
         
