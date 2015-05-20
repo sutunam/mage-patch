@@ -1,6 +1,8 @@
 # Mage-Patch
 
-Help to apply multiple Magento patches to multiple Magento installations.
+Help to apply multiple **Magento patches** to multiple Magento installations.
+
+*Note: The licence of the Magento Enterprise patches do not allow us to publish them here. If you need to patch Magento Enterprise edition, [contact us](http://en.sutunam.com/contact/)*
 
 ## Usage
 
