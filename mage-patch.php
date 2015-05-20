@@ -60,6 +60,12 @@ class PatchMage {
         }
     }
     
+    /**
+     * 
+     * @param string $dir Install folder
+     * @throws Exception
+     * @return array:string
+     */
     public function getMagentoVersion ($dir)
     {
         if (!file_exists($dir.'app/Mage.php')) {
@@ -69,7 +75,13 @@ class PatchMage {
         //require($dir.'app/Mage.php');
         //$mageVersion = Mage::getVersion();
         $mageVersion = shell_exec('php -r \'require("'.$dir.'app/Mage.php"); echo Mage::getVersion();\'');
-        return $mageVersion;
+        
+        // todo : better detection Magento CE/EE ?
+        $magentoEdition = 'CE';
+        if (file_exists($dir.'app/code/core/Enterprise/Enterprise/etc/config.xml')) {
+            $magentoEdition = 'EE';
+        }
+        return array($magentoEdition, $mageVersion);
     }
     
     protected function _downloadPatch($dir, $patchFile)
@@ -156,20 +168,30 @@ class PatchMage {
         $this->_allowedPatches = $patches; 
     }
     
+    /**
+     * 
+     * @param string $mageEdition should be CE or EE
+     * @return array Patches availables for this edition.
+     */
+    protected function _getAvailablePathList ($mageEdition)
+    {
+        return $this->_patchData['patches-'.$mageEdition];
+    }
+    
     public function patch ($dir)
     {
         $dir = rtrim($dir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
         
         echo $dir.':'.PHP_EOL;
         
-        $mageVersion = $this->getMagentoVersion($dir);
+        list($mageEdition, $mageVersion) = $this->getMagentoVersion($dir);
         //$mageVersion = '1.5.1.0';
         
-        echo 'Magento version: '.$mageVersion.PHP_EOL;
+        echo 'Magento version: '.$mageEdition.' '.$mageVersion.PHP_EOL;
         
         $appliedPatches = array();
         
-        $patches = $this->_patchData['patches-CE'];
+        $patches = $this->_getAvailablePathList($mageEdition);
         
         if ($this->_allowedPatches) {
             $patches = array_intersect_key($patches, array_flip($this->_allowedPatches));
