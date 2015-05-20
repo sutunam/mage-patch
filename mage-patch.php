@@ -169,7 +169,7 @@ class PatchMage {
         
         $appliedPatches = array();
         
-        $patches = $this->_patchData['patches'];
+        $patches = $this->_patchData['patches-CE'];
         
         if ($this->_allowedPatches) {
             $patches = array_intersect_key($patches, array_flip($this->_allowedPatches));
