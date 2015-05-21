@@ -12,6 +12,7 @@ class PatchMage {
     protected $_allowedPatches;
     protected $_continueOnError;
     protected $_dryRun = false;
+    protected $_quiet = false;
     
     public function __construct($jsonConfigUrl)
     {
@@ -144,6 +145,10 @@ class PatchMage {
             throw new Exception('cannot change current working directory to '.$dir);
         }
         
+        if ($this->_quiet) {
+            $cmd .= ' 2>&1 > /dev/null';
+        }
+        
         $ret = 0;
         if (!$this->_dryRun) {
             passthru($cmd, $ret);
@@ -195,6 +200,16 @@ class PatchMage {
         }
         
         $this->_dryRun = !!$bool;
+        return $this;
+    }
+    
+    public function setQuiet ($bool)
+    {
+        if (!$this->_isBoolParam($bool)) {
+            throw new Exception('Wrong param for quiet option.');
+        }
+    
+        $this->_quiet = !!$bool;
         return $this;
     }
     
@@ -292,7 +307,8 @@ options:
     --dryRun (1|0) (default 0)
         Do not apply any patch. Only find Magento version and check that the
         patches can be downloaded (actualy it download them and remove them).
-    
+    --quiet (0|1) (default 0)
+        Turn off stdin and stdout output of the patch script.
 OUTPUT;
         
     }    
@@ -335,6 +351,10 @@ if ($continueOnError = extractParams('--continueOnError', $dirs)) {
 
 if ($dryRun = extractParams('--dryRun', $dirs)) {
     $patch->setDryRun($dryRun);
+}
+
+if ($quiet = extractParams('--quiet', $dirs)) {
+    $patch->setQuiet($quiet);
 }
 
 if (!count($dirs)) {
