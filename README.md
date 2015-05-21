@@ -18,13 +18,16 @@ options:
         command. If you use the magic '_' value, the patch will be executed by
         the owner of the Magento directory, using sudo or su command.
     --config URL
-    	Specify $url of the config.json. Default is 
+    	Specify URL of the config.json. Default is 
     	https://raw.githubusercontent.com/sutunam/mage-patch/master/config.json
-    --patches patch-name...
+    --patches patch-name,...
         Restrict the list of the patch to be applied to one or more patch-name,
         separated by comma. The patch-names are listed in the config.json.
     --continueOnError 1|0 (default 0)
         Continue applying patch even if an error is returned by a patch.
+    --dryRun (1|0) (default 0)
+        Do not apply any patch. Only find Magento version and check that the
+        patches can be downloaded (actualy it download them and remove them).
 ```
 
 ## Examples

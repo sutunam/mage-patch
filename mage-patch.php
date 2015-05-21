@@ -11,6 +11,7 @@ class PatchMage {
     protected $_sudoUser;
     protected $_allowedPatches;
     protected $_continueOnError;
+    protected $_dryRun = false;
     
     public function __construct($jsonConfigUrl)
     {
@@ -141,7 +142,10 @@ class PatchMage {
             throw new Exception('cannot change current working directory to '.$dir);
         }
         
-        passthru($cmd, $ret);
+        $ret = 0;
+        if (!$this->_dryRun) {
+            passthru($cmd, $ret);
+        }
         
         chdir($cwd);
         
@@ -174,8 +178,27 @@ class PatchMage {
     
     public function setContinueOnError ($bool)
     {
+        if (!$this->_isBoolParam($bool)) {
+            throw new Exception('Wrong param for continueOnError option.');
+        }
+        
         $this->_continueOnError = !!$bool;
         return $this;
+    }
+    
+    public function setDryRun ($bool)
+    {
+        if (!$this->_isBoolParam($bool)) {
+            throw new Exception('Wrong param for dry-run option.');
+        }
+        
+        $this->_dryRun = !!$bool;
+        return $this;
+    }
+    
+    protected function _isBoolParam ($param)
+    {
+        return in_array($param, array(0, 1, 'true', 'false'));
     }
     
     /**
@@ -218,6 +241,7 @@ class PatchMage {
             echo 'Apply patch file: '.$patchFile.PHP_EOL;
             
             $this->_downloadPatch($dir, $patchFile);
+            
             try {
                 $this->_applyPatch($dir, $patchFile);
                 $appliedPatches[] = $patch;
@@ -263,6 +287,9 @@ options:
         separated by comma. The patch-names are listed in the config.json.
     --continueOnError 1|0 (default 0)
         Continue applying patch even if an error is returned by a patch.
+    --dryRun (1|0) (default 0)
+        Do not apply any patch. Only find Magento version and check that the
+        patches can be downloaded (actualy it download them and remove them).
     
 OUTPUT;
         
@@ -302,6 +329,10 @@ if ($patches = extractParams('--patches', $dirs)) {
 
 if ($continueOnError = extractParams('--continueOnError', $dirs)) {
     $patch->setContinueOnError($continueOnError);
+}
+
+if ($dryRun = extractParams('--dryRun', $dirs)) {
+    $patch->setDryRun($dryRun);
 }
 
 if (!count($dirs)) {
