@@ -10,6 +10,7 @@ class PatchMage {
     protected $_suUser;
     protected $_sudoUser;
     protected $_allowedPatches;
+    protected $_continueOnError;
     
     public function __construct($jsonConfigUrl)
     {
@@ -152,11 +153,13 @@ class PatchMage {
     public function setSudoUser ($user)
     {
         $this->_sudoUser = $user;
+        return $this;
     }
     
     public function setSuUser ($user)
     {
         $this->_suUser = $user;
+        return $this;
     }
     
     public function setAllowedPatches ($patches)
@@ -165,7 +168,14 @@ class PatchMage {
             $patches = explode(',', $patches);
         }
         
-        $this->_allowedPatches = $patches; 
+        $this->_allowedPatches = $patches;
+        return $this;
+    }
+    
+    public function setContinueOnError ($bool)
+    {
+        $this->_continueOnError = !!$bool;
+        return $this;
     }
     
     /**
@@ -205,16 +215,21 @@ class PatchMage {
                 continue;
             }
             
-            echo 'Patch file found: '.$patchFile.PHP_EOL;
+            echo 'Apply patch file: '.$patchFile.PHP_EOL;
             
             $this->_downloadPatch($dir, $patchFile);
-            $this->_applyPatch($dir, $patchFile);
+            try {
+                $this->_applyPatch($dir, $patchFile);
+                $appliedPatches[] = $patch;
+            } catch (Exception $e) {
+                if ($this->_continueOnError) {
+                    echo PHP_EOL."Error applying the patch ".$patch.PHP_EOL;
+                }
+            }
             unlink($dir.$patchFile);
-            
-            $appliedPatches[] = $patch;
         }
         
-        echo PHP_EOL.PHP_EOL.'The following patches have been applied :'.PHP_EOL.implode(PHP_EOL, $appliedPatches).PHP_EOL;
+        echo PHP_EOL.'The following patches have been applied :'.PHP_EOL.implode(PHP_EOL, $appliedPatches).PHP_EOL.PHP_EOL;
     }
     
     public function multiPatch (array $dirs)
@@ -246,6 +261,8 @@ options:
     --patches patch-name,...
         Restrict the list of the patch to be applied to one or more patch-name,
         separated by comma. The patch-names are listed in the config.json.
+    --continueOnError 1|0 (default 0)
+        Continue applying patch even if an error is returned by a patch.
     
 OUTPUT;
         
@@ -281,6 +298,10 @@ if ($sudo = extractParams('--sudo', $dirs)) {
 
 if ($patches = extractParams('--patches', $dirs)) {
     $patch->setAllowedPatches($patches);
+}
+
+if ($continueOnError = extractParams('--continueOnError', $dirs)) {
+    $patch->setContinueOnError($continueOnError);
 }
 
 if (!count($dirs)) {

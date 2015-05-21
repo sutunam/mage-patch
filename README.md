@@ -23,6 +23,8 @@ options:
     --patches patch-name...
         Restrict the list of the patch to be applied to one or more patch-name,
         separated by comma. The patch-names are listed in the config.json.
+    --continueOnError 1|0 (default 0)
+        Continue applying patch even if an error is returned by a patch.
 ```
 
 ## Examples
