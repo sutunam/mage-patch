@@ -43,7 +43,9 @@ class PatchMage {
     
     protected function _getPatchFile ($patchVersions, $version) {
         foreach ($patchVersions as $patchVersion => $patchFile) {
+            $patchVersion = str_replace('x', '9999', $patchVersion);
             $patchVersion = explode('->', $patchVersion);
+            
             if (count($patchVersion) == 1) {
                 $patchVersion[1] = $patchVersion[0].'.99999';
             }
