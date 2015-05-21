@@ -28,6 +28,8 @@ options:
     --dryRun (1|0) (default 0)
         Do not apply any patch. Only find Magento version and check that the
         patches can be downloaded (actualy it download them and remove them).
+    --quiet (0|1) (default 0)
+        Turn off stdin and stdout output of the patch script.
 ```
 
 ## Examples
