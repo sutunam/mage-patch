@@ -2,7 +2,7 @@
 
 Help to apply multiple **Magento patches** to multiple Magento installations.
 
-*Note: The licence of the Magento Enterprise patches do not allow us to publish them here. If you need to patch Magento Enterprise edition, [contact us](http://en.sutunam.com/contact/)*
+*Note: The license of the Magento Enterprise patches does not allow us to publish them here. If you need to patch Magento Enterprise edition, [contact us](http://en.sutunam.com/contact/)*
 
 ## Usage
 
@@ -38,6 +38,12 @@ Apply all availables patches to the Magento installion in `./htdocs` :
 ```
 curl https://raw.githubusercontent.com/sutunam/mage-patch/master/mage-patch.php | php -- ./htdocs
 ```
+
+Apply all availables patches to the Magento installion in `./htdocs`, patch scripts stay quiet, and it does not stop on error :
+```
+curl https://raw.githubusercontent.com/sutunam/mage-patch/master/mage-patch.php | php -- --quiet 1 --continueOnError 1 ./htdocs
+```
+
 
 Apply the SUPEE-5344 patch to all Magento installions in `/home/*/htdocs` by using the owners of the directories (this should be run as root and the `su` command must be available):
 ```
