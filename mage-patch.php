@@ -360,7 +360,7 @@ if ($quiet = extractParams('--quiet', $dirs)) {
 if (!count($dirs)) {
     $patch->help();
 } else {
-    $patch->multiPatch($dirs, $sudo);
+    $patch->multiPatch($dirs);
 }
 
 
