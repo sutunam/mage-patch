@@ -32,7 +32,13 @@ options:
         Turn off stdin and stdout output of the patch script.
 ```
 
+## Notes
+
+You don't need to care about an error: if a patch is not applicable, the Magento script do not apply it (this is featured by Magento). You can so allways run the script with the ```--continueOnError 1``` option.
+
 ## Examples
+
+
 
 Apply all availables patches to the Magento installion in `./htdocs` :
 ```
@@ -45,7 +51,7 @@ curl https://raw.githubusercontent.com/sutunam/mage-patch/master/mage-patch.php 
 ```
 
 
-Apply the SUPEE-5344 patch to all Magento installions in `/home/*/htdocs` by using the owners of the directories (this should be run as root and the `su` command must be available):
+Apply the SUPEE-5344 patch to all Magento installions in `/home/*/htdocs` by using the owners of the directories (**this should be run as root** and the `su` command must be available):
 ```
 curl https://raw.githubusercontent.com/sutunam/mage-patch/master/mage-patch.php | php -- --patches SUPEE-5344 --su _ /home/*/htdocs
 ```
