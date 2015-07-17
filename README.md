@@ -50,6 +50,12 @@ Apply all availables patches to the Magento installion in `./htdocs`, patch scri
 curl https://raw.githubusercontent.com/sutunam/mage-patch/master/mage-patch.php | php -- --quiet 1 --continueOnError 1 ./htdocs
 ```
 
+Same as before, but it applies only the patch SUPEE-6285 :
+```
+curl https://raw.githubusercontent.com/sutunam/mage-patch/master/mage-patch.php | php -- --quiet 1 --continueOnError 1 --patches SUPEE-6285 ./htdocs
+```
+
+
 
 Apply the SUPEE-5344 patch to all Magento installions in `/home/*/htdocs` by using the owners of the directories (**this should be run as root** and the `su` command must be available):
 ```
