@@ -279,7 +279,7 @@ class PatchMage {
                 }
             }
             
-            if ($this->_keepDownloadedPatch) {
+            if (!$this->_keepDownloadedPatch) {
                 unlink($dir.$patchFile);
             }
         }
