@@ -12,6 +12,7 @@ class PatchMage {
     protected $_allowedPatches;
     protected $_continueOnError;
     protected $_dryRun = false;
+    protected $_keepDownloadedPatch = false;
     protected $_quiet = false;
     
     public function __construct($jsonConfigUrl)
@@ -202,6 +203,16 @@ class PatchMage {
         $this->_dryRun = !!$bool;
         return $this;
     }
+
+    public function setKeepDownloadedPatch ($bool)
+    {
+        if (!$this->_isBoolParam($bool)) {
+            throw new Exception('Wrong param for keepDownloadedPatch option.');
+        }
+    
+        $this->_keepDownloadedPatch = !!$bool;
+        return $this;
+    }
     
     public function setQuiet ($bool)
     {
@@ -267,7 +278,10 @@ class PatchMage {
                     echo PHP_EOL."Error applying the patch ".$patch.PHP_EOL;
                 }
             }
-            unlink($dir.$patchFile);
+            
+            if ($this->_keepDownloadedPatch) {
+                unlink($dir.$patchFile);
+            }
         }
         
         echo PHP_EOL.'The following patches have been applied :'.PHP_EOL.implode(PHP_EOL, $appliedPatches).PHP_EOL.PHP_EOL;
@@ -307,6 +321,8 @@ options:
     --dryRun (1|0) (default 0)
         Do not apply any patch. Only find Magento version and check that the
         patches can be downloaded (actualy it download them and remove them).
+    --keepDownloadedPatch 1|0 (default 0)
+        Download the patch and do not delete it, the patch files stay in the specified directory.
     --quiet (0|1) (default 0)
         Turn off stdin and stdout output of the patch script.
 OUTPUT;
@@ -351,6 +367,10 @@ if ($continueOnError = extractParams('--continueOnError', $dirs)) {
 
 if ($dryRun = extractParams('--dryRun', $dirs)) {
     $patch->setDryRun($dryRun);
+}
+
+if ($kdp = extractParams('--keepDownloadedPatch', $dirs)) {
+    $patch->setKeepDownloadedPatch($kdp);
 }
 
 if ($quiet = extractParams('--quiet', $dirs)) {
