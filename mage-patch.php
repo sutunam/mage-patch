@@ -15,15 +15,18 @@ class PatchMage {
     protected $_keepDownloadedPatch = false;
     protected $_quiet = false;
     
-    public function __construct($jsonConfigUrl)
+    public function __construct($jsonConfigUrl = null)
     {
         $this->_loadJsonData($jsonConfigUrl);
     }
     
-    protected function _loadJsonData($url)
+    protected function _loadJsonData($url = null)
     {
         if (!$url) {
             $this->_patchData = json_decode(file_get_contents(__DIR__.'/config.json'), true);
+            if (!$this->_patchData) {
+                throw new Exception('Error loading config file');
+            }
             return;
         }
         
@@ -43,7 +46,8 @@ class PatchMage {
     }
     
     
-    protected function _getPatchFile ($patchVersions, $version) {
+    protected function _getPatchFile ($patchVersions, $version)
+    {
         foreach ($patchVersions as $patchVersion => $patchFile) {
             $patchVersion = str_replace('x', '9999', $patchVersion);
             $patchVersion = explode('->', $patchVersion);
